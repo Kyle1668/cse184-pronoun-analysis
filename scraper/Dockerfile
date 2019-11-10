@@ -11,7 +11,6 @@ RUN apk update && \
 
 RUN pip3 install requests \
                  beautifulsoup4 \
-                 psycopg2 \
                  selenium \
                  webdriver-manager \
                  python-dotenv
