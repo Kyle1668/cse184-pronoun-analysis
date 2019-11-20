@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import NationalStatCard from "./NationalStatCard";
+import data from "../data.json";
 
 export default class PageHeader extends Component {
   render() {

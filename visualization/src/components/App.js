@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import "./App.css"; /* optional for styling like the :hover pseudo-class */
+import "../styles/App.css";
 import USAMap from "react-usa-map";
-import PageHeader from "./components/PageHeader";
+import PageHeader from "./PageHeader";
 
 class App extends Component {
   /* mandatory */
