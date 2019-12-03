@@ -61,7 +61,27 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('joblocation_address', 'location') \
             .withColumnRenamed('jobdescription', 'description')
 
-    data_frame = data_frame.dropDuplicates().dropna()
+    elif file_name == "monster_com-job_sample.csv":
+        data_frame = data_frame \
+            .where("country = 'United States of America'") \
+            .drop("country") \
+            .drop("country_code") \
+            .drop("date_added") \
+            .drop("has_expired") \
+            .drop("job_board") \
+            .drop("job_type") \
+            .drop("page_url") \
+            .drop("salary") \
+            .drop("sector") \
+            .drop("uniq_id") \
+            .withColumnRenamed('organization', 'company') \
+            .withColumnRenamed('job_description', 'description') \
+
+    data_frame = data_frame \
+        .dropDuplicates() \
+        .dropna() \
+        .select("job_title", "company", "location", "description")
+
     return data_frame
 
 
@@ -123,6 +143,7 @@ if __name__ == "__main__":
         f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
         f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
         f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
+        f"{working_directory_path}/raw_data/monster/monster_com-job_sample.csv",
     ]
 
     # Get combined data frame from the distriubted data frames
