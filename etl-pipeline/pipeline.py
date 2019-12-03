@@ -5,10 +5,26 @@ import os
 
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
-    try:
-        return spark.read.csv(csv_file_path, header=True, inferSchema=True)
-    except:
-        pass
+    # advertiserurl,company,employmenttype_jobstatus,jobdescription,
+    # jobid,joblocation_address,jobtitle,postdate,shift,site_name,skills,uniq_id
+
+    # job_title, company, location,
+
+    file_name = csv_file_path.split("/")[-1]
+
+    if file_name == "ComputerSystemjobs.csv":
+        data_frame = spark.read.csv(csv_file_path,
+                                    header=True,
+                                    inferSchema=True)
+        data_frame = data_frame \
+            .drop("Field1") \
+            .drop("Field2_Text") \
+            .drop("Field3") \
+            .drop("Field5")
+
+        return data_frame
+    else:
+        return None
 
 
 if __name__ == "__main__":
@@ -41,7 +57,9 @@ if __name__ == "__main__":
         "./raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
-    data_frames = map(lambda file: create_data_frame_from_csv(spark, file), csv_paths)
+    callback_function = lambda file: create_data_frame_from_csv(spark, file)
+    data_frames = map(callback_function, csv_paths)
 
     for df in data_frames:
-        df.printSchema()
+        if df is not None:
+            df.printSchema()
