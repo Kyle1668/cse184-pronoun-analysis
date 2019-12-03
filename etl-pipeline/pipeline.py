@@ -38,7 +38,8 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Field1', 'job_title') \
             .withColumnRenamed('Field2', 'company') \
             .withColumnRenamed('Field3', 'location') \
-            .withColumnRenamed('Field6', 'description')
+            .withColumnRenamed('Field6', 'description') \
+            .where("location != '-'")
 
     elif file_name == "SoftwareEngineerJobs.csv":
         data_frame = data_frame \
@@ -48,7 +49,6 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Description', 'description')
 
     data_frame = data_frame.dropDuplicates().dropna()
-    print(f"NUM ROWS AFTER CLEANING: {data_frame.count}")
     return data_frame
 
 
