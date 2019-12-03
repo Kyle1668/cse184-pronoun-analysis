@@ -8,23 +8,24 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
     # advertiserurl,company,employmenttype_jobstatus,jobdescription,
     # jobid,joblocation_address,jobtitle,postdate,shift,site_name,skills,uniq_id
 
-    # job_title, company, location,
+    # job_title, company, location, description
 
     file_name = csv_file_path.split("/")[-1]
+    data_frame = spark.read.csv(csv_file_path, header=True, inferSchema=True)
 
     if file_name == "ComputerSystemjobs.csv":
-        data_frame = spark.read.csv(csv_file_path,
-                                    header=True,
-                                    inferSchema=True)
         data_frame = data_frame \
             .drop("Field1") \
             .drop("Field2_Text") \
             .drop("Field3") \
-            .drop("Field5")
+            .drop("Field5") \
+            .withColumnRenamed('Title', 'job_title') \
+            .withColumnRenamed('Company', 'company') \
+            .withColumnRenamed('Location', 'location') \
+            .withColumnRenamed('Description', 'description') \
 
-        return data_frame
-    else:
-        return None
+    data_frame = data_frame.dropDuplicates().dropna()
+    return data_frame
 
 
 if __name__ == "__main__":
@@ -52,14 +53,22 @@ if __name__ == "__main__":
     # Create data frames from CSV Files
     csv_paths = [
         "./raw_data/indeed/ComputerSystemjobs.csv",
-        "./raw_data/indeed/ProjectManagerJobs.csv",
-        "./raw_data/indeed/SoftwareEngineerJobs.csv",
-        "./raw_data/kaggle/dice_com-job_us_sample.csv",
+        # "./raw_data/indeed/ProjectManagerJobs.csv",
+        # "./raw_data/indeed/SoftwareEngineerJobs.csv",
+        # "./raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
     callback_function = lambda file: create_data_frame_from_csv(spark, file)
     data_frames = map(callback_function, csv_paths)
 
-    for df in data_frames:
-        if df is not None:
-            df.printSchema()
+    for derived_dataset in data_frames:
+        if derived_dataset is not None:
+            derived_dataset.coalesce(1).write.csv("../derived_dataset",
+                                                  mode="append",
+                                                  header=True,
+                                                  quoteAll=True,
+                                                  ignoreLeadingWhiteSpace=True,
+                                                  ignoreTrailingWhiteSpace=True)
+
+            derived_dataset.printSchema()
+            derived_dataset.unpersist()
