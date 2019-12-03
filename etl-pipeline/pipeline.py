@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 import pandas as pd
 import numpy as np
 import os
@@ -6,10 +6,17 @@ import os
 
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
-    # advertiserurl,company,employmenttype_jobstatus,jobdescription,
-    # jobid,joblocation_address,jobtitle,postdate,shift,site_name,skills,uniq_id
+    """This function creates a daat frame from a CSV file and cleans itself.
+       The column names are changed to matched the agreed on schema for analysis.
+       Schema: job_title, company, location, description
 
-    # job_title, company, location, description
+    Args:
+        spark_instance (SparkSession.builder): The spark session to use the df methods from
+        csv_file_path (Str): Path to the CSV file
+
+    Returns:
+        pyspark.sql.DataFrame: The cleaned pyspark data frame of the CSV file
+    """
 
     file_name = csv_file_path.split("/")[-1]
     data_frame = spark.read.csv(csv_file_path, header=True, inferSchema=True)
@@ -23,7 +30,13 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Title', 'job_title') \
             .withColumnRenamed('Company', 'company') \
             .withColumnRenamed('Location', 'location') \
-            .withColumnRenamed('Description', 'description') \
+            .withColumnRenamed('Description', 'description')
+    elif file_name == "ProjectManagerJobs.csv":
+        data_frame = data_frame \
+            .withColumnRenamed('Field1', 'job_title') \
+            .withColumnRenamed('Field2', 'company') \
+            .withColumnRenamed('Field3', 'location') \
+            .withColumnRenamed('Field6', 'description') \
 
     data_frame = data_frame.dropDuplicates().dropna()
     return data_frame
@@ -55,23 +68,25 @@ if __name__ == "__main__":
     working_directory_path = os.path.dirname(os.path.realpath(__file__))
     raw_datasets_paths = [
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
-        # f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
+        f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
         # f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
         # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
     callback_function = lambda file: create_data_frame_from_csv(spark, file)
     data_frames = map(callback_function, raw_datasets_paths)
+    combined_data_frame = list(data_frames)[0]
 
-    for derived_dataset in data_frames:
+    for derived_dataset in list(data_frames)[1:]:
         if derived_dataset is not None:
-            derived_dataset.coalesce(1).write.csv(
-                f"{working_directory_path}/../derived_data",
-                mode="append",
-                header=True,
-                quoteAll=True,
-                ignoreLeadingWhiteSpace=True,
-                ignoreTrailingWhiteSpace=True)
-
+            combined_data_frame = combined_data_frame.union(derived_dataset)
             derived_dataset.printSchema()
             derived_dataset.unpersist()
+
+    combined_data_frame.coalesce(1).write.csv(
+        f"{working_directory_path}/../derived_data",
+        mode="append",
+        header=True,
+        quoteAll=True,
+        ignoreLeadingWhiteSpace=True,
+        ignoreTrailingWhiteSpace=True)
