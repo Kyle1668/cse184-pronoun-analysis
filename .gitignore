@@ -5,7 +5,11 @@
 ### dotenv ###
 .env
 
-data/*/*.csv
+# data/*/*.csv
+derived_dataset/
+
+.vscode/
+./.vscode/
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
