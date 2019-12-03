@@ -6,6 +6,7 @@
 .env
 
 # data/*/*.csv
+derived_dataset/
 
 .vscode/
 ./.vscode/

@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 import pandas as pd
 import numpy as np
 import os
+import os
 
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
@@ -51,24 +52,26 @@ if __name__ == "__main__":
     log = log4jLogger.LogManager.getLogger(__name__)
 
     # Create data frames from CSV Files
-    csv_paths = [
-        "./raw_data/indeed/ComputerSystemjobs.csv",
-        # "./raw_data/indeed/ProjectManagerJobs.csv",
-        # "./raw_data/indeed/SoftwareEngineerJobs.csv",
-        # "./raw_data/kaggle/dice_com-job_us_sample.csv",
+    working_directory_path = os.path.dirname(os.path.realpath(__file__))
+    raw_datasets_paths = [
+        f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
+        # f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
+        # f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
+        # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
     callback_function = lambda file: create_data_frame_from_csv(spark, file)
-    data_frames = map(callback_function, csv_paths)
+    data_frames = map(callback_function, raw_datasets_paths)
 
     for derived_dataset in data_frames:
         if derived_dataset is not None:
-            derived_dataset.coalesce(1).write.csv("../derived_dataset",
-                                                  mode="append",
-                                                  header=True,
-                                                  quoteAll=True,
-                                                  ignoreLeadingWhiteSpace=True,
-                                                  ignoreTrailingWhiteSpace=True)
+            derived_dataset.coalesce(1).write.csv(
+                f"{working_directory_path}/../derived_data",
+                mode="append",
+                header=True,
+                quoteAll=True,
+                ignoreLeadingWhiteSpace=True,
+                ignoreTrailingWhiteSpace=True)
 
             derived_dataset.printSchema()
             derived_dataset.unpersist()
