@@ -2,7 +2,6 @@ from pyspark.sql import SparkSession, DataFrame
 import pandas as pd
 import numpy as np
 import os
-import os
 
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
@@ -48,11 +47,35 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Location', 'location') \
             .withColumnRenamed('Description', 'description')
 
+    elif file_name == "dice_com-job_us_sample.csv":
+        data_frame = data_frame \
+            .drop("advertiserurl") \
+            .drop("employmenttype_jobstatus") \
+            .drop("jobid") \
+            .drop("postdate") \
+            .drop("shift") \
+            .drop("site_name") \
+            .drop("skills") \
+            .drop("uniq_id") \
+            .withColumnRenamed('jobtitle', 'job_title') \
+            .withColumnRenamed('joblocation_address', 'location') \
+            .withColumnRenamed('jobdescription', 'description')
+
     data_frame = data_frame.dropDuplicates().dropna()
     return data_frame
 
 
 def combine_datasets(spark, raw_datasets_paths):
+    """This function takes in a list of CSV files and returns the combined data
+       frame from their values. Rows with misisng data and duplicates are removed.
+
+    Args:
+        spark (SparkSession.builder): The spark session to use the df methods from
+        raw_datasets_paths (list[str]): Path to the CSV files
+
+    Returns:
+        pyspark.sql.DataFrame: The combined cleaned data frame
+    """
     data_frames = [
         create_data_frame_from_csv(spark, file) for file in raw_datasets_paths
     ]
@@ -99,15 +122,18 @@ if __name__ == "__main__":
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
         f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
         f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
-        # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
+        f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
+    # Get combined data frame from the distriubted data frames
     combined_data_frame = combine_datasets(spark, raw_datasets_paths)
 
-    combined_data_frame.coalesce(1).write.csv(
-        f"{working_directory_path}/../derived_data",
-        mode="append",
-        header=True,
-        quoteAll=True,
-        ignoreLeadingWhiteSpace=True,
-        ignoreTrailingWhiteSpace=True)
+    # Write the combined data frame to local CSV file for further analysis
+    if combine_datasets != None:
+        combined_data_frame.coalesce(1).write.csv(
+            f"{working_directory_path}/../derived_data",
+            mode="append",
+            header=True,
+            quoteAll=True,
+            ignoreLeadingWhiteSpace=True,
+            ignoreTrailingWhiteSpace=True)
