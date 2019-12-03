@@ -19,8 +19,6 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
     """
 
     file_name = csv_file_path.split("/")[-1]
-
-    print(file_name)
     data_frame = spark.read.csv(csv_file_path, header=True, inferSchema=True)
 
     if file_name == "ComputerSystemjobs.csv":
@@ -33,13 +31,21 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Company', 'company') \
             .withColumnRenamed('Location', 'location') \
             .withColumnRenamed('Description', 'description')
+
     elif file_name == "ProjectManagerJobs.csv":
         data_frame = data_frame \
             .drop("Field4") \
             .withColumnRenamed('Field1', 'job_title') \
             .withColumnRenamed('Field2', 'company') \
             .withColumnRenamed('Field3', 'location') \
-            .withColumnRenamed('Field6', 'description') \
+            .withColumnRenamed('Field6', 'description')
+
+    elif file_name == "SoftwareEngineerJobs.csv":
+        data_frame = data_frame \
+            .withColumnRenamed('Title', 'job_title') \
+            .withColumnRenamed('Company', 'company') \
+            .withColumnRenamed('Location', 'location') \
+            .withColumnRenamed('Description', 'description')
 
     data_frame = data_frame.dropDuplicates().dropna()
     print(f"NUM ROWS AFTER CLEANING: {data_frame.count}")
@@ -60,7 +66,7 @@ def combine_datasets(spark, raw_datasets_paths):
                 derived_dataset.printSchema()
                 derived_dataset.unpersist()
 
-        return combined_data_frame
+        return combined_data_frame.dropDuplicates()
 
     return None
 
@@ -92,7 +98,7 @@ if __name__ == "__main__":
     raw_datasets_paths = [
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
         f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
-        # f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
+        f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
         # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
