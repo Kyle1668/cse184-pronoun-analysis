@@ -19,6 +19,8 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
     """
 
     file_name = csv_file_path.split("/")[-1]
+
+    print(file_name)
     data_frame = spark.read.csv(csv_file_path, header=True, inferSchema=True)
 
     if file_name == "ComputerSystemjobs.csv":
@@ -33,13 +35,34 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('Description', 'description')
     elif file_name == "ProjectManagerJobs.csv":
         data_frame = data_frame \
+            .drop("Field4") \
             .withColumnRenamed('Field1', 'job_title') \
             .withColumnRenamed('Field2', 'company') \
             .withColumnRenamed('Field3', 'location') \
             .withColumnRenamed('Field6', 'description') \
 
     data_frame = data_frame.dropDuplicates().dropna()
+    print(f"NUM ROWS AFTER CLEANING: {data_frame.count}")
     return data_frame
+
+
+def combine_datasets(spark, raw_datasets_paths):
+    data_frames = [
+        create_data_frame_from_csv(spark, file) for file in raw_datasets_paths
+    ]
+
+    if (len(data_frames) > 0):
+        combined_data_frame = data_frames[0]
+
+        if (combined_data_frame != None):
+            for derived_dataset in data_frames:
+                combined_data_frame = combined_data_frame.union(derived_dataset)
+                derived_dataset.printSchema()
+                derived_dataset.unpersist()
+
+        return combined_data_frame
+
+    return None
 
 
 if __name__ == "__main__":
@@ -73,15 +96,7 @@ if __name__ == "__main__":
         # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
     ]
 
-    callback_function = lambda file: create_data_frame_from_csv(spark, file)
-    data_frames = map(callback_function, raw_datasets_paths)
-    combined_data_frame = list(data_frames)[0]
-
-    for derived_dataset in list(data_frames)[1:]:
-        if derived_dataset is not None:
-            combined_data_frame = combined_data_frame.union(derived_dataset)
-            derived_dataset.printSchema()
-            derived_dataset.unpersist()
+    combined_data_frame = combine_datasets(spark, raw_datasets_paths)
 
     combined_data_frame.coalesce(1).write.csv(
         f"{working_directory_path}/../derived_data",
