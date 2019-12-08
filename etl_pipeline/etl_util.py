@@ -1,5 +1,5 @@
 from pyspark.sql.functions import UserDefinedFunction
-from pyspark.sql.types import StringType
+from pyspark.sql.types import StringType, NullType
 import string
 
 __state_ids = {
@@ -61,11 +61,11 @@ __inverted_state_ids = dict((v, k) for k, v in __state_ids.items())
 
 
 def __match_location_to_state(raw_location):
-    if raw_location is None:
-        return ""
+    if raw_location is None or raw_location == "":
+        return None
 
     formatted_location = raw_location
-    state = ""
+    state = None
 
     # Remove puncuation
     for char in string.punctuation:
@@ -75,9 +75,9 @@ def __match_location_to_state(raw_location):
 
     # Check if the element is a state code
     for element in formatted_location:
-        if element in __state_ids and state == "":
+        if element in __state_ids and state is None:
             state = element
-        elif element in __inverted_state_ids and state == "":
+        elif element in __inverted_state_ids and state is None:
             state = __inverted_state_ids[element]
 
     return state

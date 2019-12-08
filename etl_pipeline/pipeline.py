@@ -153,9 +153,9 @@ if __name__ == "__main__":
     working_directory_path = os.path.dirname(os.path.realpath(__file__))
     raw_datasets_paths = [
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
-        # f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
-        # f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
-        # f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
+        f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
+        f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
+        f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
         # f"{working_directory_path}/raw_data/monster/monster_com-job_sample.csv",
     ]
 

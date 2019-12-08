@@ -1,4 +1,5 @@
 from etl_pipeline.etl_util import __match_location_to_state
+from pyspark.sql.types import NullType
 import pytest
 import string
 
@@ -18,13 +19,13 @@ def test_match_location_to_state_long_state_name():
 
 
 def test_match_location_to_state_invalid_state_name():
-    assert (__match_location_to_state("Richmond -- Virg") == "")
+    assert (__match_location_to_state("Richmond -- Virg") == None)
 
 
 def test_match_location_to_state_missing_state():
-    assert (__match_location_to_state("Richmond") == "")
+    assert (__match_location_to_state("Richmond") == None)
 
 
 def test_match_location_to_state_missing_value():
-    assert (__match_location_to_state("") == "")
-    assert (__match_location_to_state(None) == "")
+    assert (__match_location_to_state("") == None)
+    assert (__match_location_to_state(None) == None)
