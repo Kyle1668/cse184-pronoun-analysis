@@ -1,3 +1,6 @@
+"""Utilities for the Spark ETL pipeline
+"""
+
 from pyspark.sql.functions import UserDefinedFunction
 from pyspark.sql.types import StringType, NullType
 import string
@@ -61,6 +64,15 @@ __inverted_state_ids = dict((v, k) for k, v in __state_ids.items())
 
 
 def __match_location_to_state(raw_location):
+    """Takes in a string and returns the included US state ID.
+       Return None if no state can be matched.
+
+    Args:
+        raw_location (str): The unformated state location. EX: "PAlo Alto, CA"
+
+    Returns:
+        str or None: The string state or None if no state can be matched
+    """
     if raw_location is None or raw_location == "":
         return None
 
@@ -83,6 +95,7 @@ def __match_location_to_state(raw_location):
     return state
 
 
+# The Pyspark function. Necessary tto be able to perform operations on a Pyspark data frame column.
 __column_state_lambda_func = lambda x: __match_location_to_state(x)
-
-match_location_to_state = UserDefinedFunction(__column_state_lambda_func, StringType())
+match_location_to_state = UserDefinedFunction(__column_state_lambda_func,
+                                              StringType())

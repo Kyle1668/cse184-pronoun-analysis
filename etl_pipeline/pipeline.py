@@ -8,7 +8,7 @@ import os
 
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
-    """This function creates a daat frame from a CSV file and cleans itself.
+    """This function creates a data frame from a CSV file and cleans itself.
        The column names are changed to matched the agreed on schema for analysis.
        Schema: job_title, company, location, description
 
