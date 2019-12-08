@@ -1,4 +1,3 @@
-from etl_pipeline.pipeline import match_location_to_state
 from etl_pipeline.etl_util import match_location_to_state
 import pytest
 import string
