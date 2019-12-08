@@ -4,14 +4,6 @@ import numpy as np
 import string
 import os
 
-states = [
-    'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
-    'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
-    'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH',
-    'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA',
-    'WV', 'WI', 'WY'
-]
-
 
 def create_data_frame_from_csv(spark_instance, csv_file_path):
     """This function creates a daat frame from a CSV file and cleans itself.
@@ -93,24 +85,6 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
         .select("job_title", "company", "location", "description")
 
     return data_frame
-
-
-def match_location_to_state(raw_location):
-    formatted_location = raw_location
-    state = None
-
-    # Remove puncuation
-    for char in string.punctuation:
-        formatted_location = formatted_location.replace(char, ' ')
-
-    formatted_location = formatted_location.split(" ")
-
-    # Check if the element is a state code
-    for element in formatted_location:
-        if element in states and state is None:
-            state = element
-
-    return state
 
 
 def combine_datasets(spark, raw_datasets_paths):
