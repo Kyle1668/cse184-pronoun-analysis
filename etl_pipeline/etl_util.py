@@ -1,7 +1,8 @@
-import pytest
+from pyspark.sql.functions import UserDefinedFunction
+from pyspark.sql.types import StringType
 import string
 
-state_ids = {
+__state_ids = {
     'AK': 'Alaska',
     'AL': 'Alabama',
     'AR': 'Arkansas',
@@ -56,15 +57,15 @@ state_ids = {
     'WY': 'Wyoming'
 }
 
-inverted_state_ids = dict((v, k) for k, v in state_ids.items())
+__inverted_state_ids = dict((v, k) for k, v in __state_ids.items())
 
 
-def match_location_to_state(raw_location):
+def __match_location_to_state(raw_location):
     if raw_location is None:
-        return raw_location
+        return ""
 
     formatted_location = raw_location
-    state = None
+    state = ""
 
     # Remove puncuation
     for char in string.punctuation:
@@ -74,9 +75,15 @@ def match_location_to_state(raw_location):
 
     # Check if the element is a state code
     for element in formatted_location:
-        if element in state_ids and state is None:
+        if element in __state_ids and state == "":
             state = element
-        elif element in inverted_state_ids and state is None:
-            state = inverted_state_ids[element]
+        elif element in __inverted_state_ids and state == "":
+            state = __inverted_state_ids[element]
 
     return state
+
+
+__column_state_lambda_func = lambda x: __match_location_to_state(x)
+
+spark_function_match_location_to_state = UserDefinedFunction(
+    __column_state_lambda_func, StringType())
