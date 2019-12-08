@@ -1,4 +1,4 @@
-from etl_pipeline.etl_util import spark_function_match_location_to_state
+from etl_pipeline.etl_util import match_location_to_state
 from pyspark.sql import SparkSession, DataFrame
 import pandas as pd
 import numpy as np
@@ -65,7 +65,6 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('jobdescription', 'description')
 
     elif file_name == "monster_com-job_sample.csv":
-        # country,country_code,date_added,has_expired,job_board,job_description,job_title,job_type,location,organization,page_url,salary,sector,uniq_id
         data_frame = data_frame \
             .where("country = 'United States of America'") \
             .drop("country") \
@@ -82,7 +81,7 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('job_description', 'description') \
 
     data_frame = data_frame \
-        .withColumn("location", spark_function_match_location_to_state(data_frame.location)) \
+        .withColumn("location", match_location_to_state(data_frame.location)) \
         .dropDuplicates() \
         .dropna() \
         .select("job_title", "company", "location", "description")

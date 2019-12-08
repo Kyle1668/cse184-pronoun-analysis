@@ -85,5 +85,4 @@ def __match_location_to_state(raw_location):
 
 __column_state_lambda_func = lambda x: __match_location_to_state(x)
 
-spark_function_match_location_to_state = UserDefinedFunction(
-    __column_state_lambda_func, StringType())
+match_location_to_state = UserDefinedFunction(__column_state_lambda_func, StringType())

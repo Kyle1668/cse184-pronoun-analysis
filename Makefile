@@ -7,5 +7,5 @@ test:
 format:
 
 
-etl-pipeline:
+pipeline:
 	pipenv run spark-submit $(pipeline_file)
