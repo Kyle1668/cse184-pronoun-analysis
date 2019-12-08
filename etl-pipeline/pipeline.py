@@ -102,12 +102,21 @@ def combine_datasets(spark, raw_datasets_paths):
 
     if (len(data_frames) > 0):
         combined_data_frame = data_frames[0]
+        iteration = 1
 
         if (combined_data_frame != None):
-            for derived_dataset in data_frames:
+            for index in range(len(data_frames)):
+                derived_dataset = data_frames[index]
+
+                if (index == len(data_frames) - 1):
+                    derived_dataset = derived_dataset.join(
+                        combined_data_frame, ['job_title'], 'leftsemi')
+
                 combined_data_frame = combined_data_frame.union(derived_dataset)
                 derived_dataset.printSchema()
                 derived_dataset.unpersist()
+
+            iteration += 1
 
         return combined_data_frame.dropDuplicates()
 
@@ -136,7 +145,7 @@ if __name__ == "__main__":
     log4jLogger = spark._jvm.org.apache.log4j
     log = log4jLogger.LogManager.getLogger(__name__)
 
-    # Create data frames from CSV Files
+    # Create data frames from CSV Files. Monster dataset should be last.
     working_directory_path = os.path.dirname(os.path.realpath(__file__))
     raw_datasets_paths = [
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
