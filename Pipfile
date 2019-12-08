@@ -4,8 +4,18 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
+pylint = "*"
+yapf = "*"
+pytest-watch = "*"
 
 [packages]
+jupyter = "*"
+pyspark = "*"
+matplotlib = "*"
+numpy = "*"
+pandas = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.7"
