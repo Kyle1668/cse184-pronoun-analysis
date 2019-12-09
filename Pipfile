@@ -16,6 +16,8 @@ matplotlib = "*"
 numpy = "*"
 pandas = "*"
 python-dotenv = "*"
+plotly = "*"
+pandas_bokeh = "*"
 
 [requires]
 python_version = "3.7"
