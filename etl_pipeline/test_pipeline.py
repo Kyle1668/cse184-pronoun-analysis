@@ -1,3 +1,6 @@
+"""Unit tests for the pipeline functions. Uses pytest
+"""
+
 from etl_pipeline.etl_util import __match_location_to_state
 from pyspark.sql.types import NullType
 import pytest
