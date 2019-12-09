@@ -6,7 +6,6 @@ import string
 import os
 
 
-
 def create_data_frame_from_csv(spark_instance, csv_file_path):
     """This function creates a data frame from a CSV file and cleans itself.
        The column names are changed to matched the agreed on schema for analysis.
@@ -64,6 +63,13 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
             .withColumnRenamed('joblocation_address', 'location') \
             .withColumnRenamed('jobdescription', 'description')
 
+    elif file_name == "glassdoor_com-jobs-10.csv":
+        data_frame = data_frame \
+            .withColumnRenamed('Title', 'job_title') \
+            .withColumnRenamed('Company', 'company') \
+            .withColumnRenamed('Location', 'location') \
+            .withColumnRenamed('Field4', 'description')
+
     elif file_name == "monster_com-job_sample.csv":
         data_frame = data_frame \
             .where("country = 'United States of America'") \
@@ -112,9 +118,9 @@ def combine_datasets(spark, raw_datasets_paths):
             for index in range(len(data_frames)):
                 derived_dataset = data_frames[index]
 
-                # if (index == len(data_frames) - 1):
-                #     derived_dataset = derived_dataset.join(
-                #         combined_data_frame, ['job_title'], 'leftsemi')
+                derived_dataset = derived_dataset.join(combined_data_frame,
+                                                       ['job_title'],
+                                                       'leftsemi')
 
                 combined_data_frame = combined_data_frame.union(derived_dataset)
                 derived_dataset.printSchema()
@@ -152,11 +158,12 @@ if __name__ == "__main__":
     # Create data frames from CSV Files. Monster dataset should be last.
     working_directory_path = os.path.dirname(os.path.realpath(__file__))
     raw_datasets_paths = [
+        f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
         f"{working_directory_path}/raw_data/indeed/ComputerSystemjobs.csv",
         f"{working_directory_path}/raw_data/indeed/ProjectManagerJobs.csv",
         f"{working_directory_path}/raw_data/indeed/SoftwareEngineerJobs.csv",
-        f"{working_directory_path}/raw_data/kaggle/dice_com-job_us_sample.csv",
-        # f"{working_directory_path}/raw_data/monster/monster_com-job_sample.csv",
+        f"{working_directory_path}/raw_data/glassdoor/glassdoor_com-jobs-10.csv",
+        f"{working_directory_path}/raw_data/monster/monster_com-job_sample.csv",
     ]
 
     # Get combined data frame from the distriubted data frames
@@ -165,7 +172,7 @@ if __name__ == "__main__":
     # Write the combined data frame to local CSV file for further analysis
     if combine_datasets != None:
         combined_data_frame.coalesce(1).write.csv(
-            f"{working_directory_path}/../derived_data",
+            f"{working_directory_path}/../data",
             mode="append",
             header=True,
             quoteAll=True,
