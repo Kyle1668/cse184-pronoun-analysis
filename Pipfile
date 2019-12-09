@@ -18,6 +18,7 @@ pandas = "*"
 python-dotenv = "*"
 plotly = "*"
 pandas_bokeh = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.7"
