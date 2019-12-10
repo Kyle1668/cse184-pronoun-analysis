@@ -4,6 +4,7 @@
 from pyspark.sql.functions import UserDefinedFunction
 from pyspark.sql.types import StringType, NullType
 import string
+import re
 
 __state_ids = {
     'AK': 'Alaska',
@@ -99,3 +100,8 @@ def __match_location_to_state(raw_location):
 __column_state_lambda_func = lambda x: __match_location_to_state(x)
 match_location_to_state = UserDefinedFunction(__column_state_lambda_func,
                                               StringType())
+
+__remove_symbols_from_description = lambda x: re.sub(r'[^\w\s]','',x)
+
+remove_symbols_from_description = UserDefinedFunction(
+    __remove_symbols_from_description, StringType())
