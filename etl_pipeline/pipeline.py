@@ -1,4 +1,4 @@
-from etl_pipeline.etl_util import match_location_to_state
+from etl_pipeline.etl_util import match_location_to_state, remove_symbols_from_description
 from pyspark.sql import SparkSession, DataFrame
 import pandas as pd
 import numpy as np
@@ -88,6 +88,7 @@ def create_data_frame_from_csv(spark_instance, csv_file_path):
 
     data_frame = data_frame \
         .withColumn("location", match_location_to_state(data_frame.location)) \
+        .withColumn("description", remove_symbols_from_description(data_frame.description)) \
         .dropDuplicates() \
         .dropna() \
         .select("job_title", "company", "location", "description")
@@ -176,5 +177,4 @@ if __name__ == "__main__":
             mode="append",
             header=True,
             quoteAll=True,
-            ignoreLeadingWhiteSpace=True,
             ignoreTrailingWhiteSpace=True)

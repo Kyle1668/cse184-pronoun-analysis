@@ -1,7 +1,7 @@
 """Unit tests for the pipeline functions. Uses pytest
 """
 
-from etl_pipeline.etl_util import __match_location_to_state
+from etl_pipeline.etl_util import __match_location_to_state, __remove_symbols_from_description
 from pyspark.sql.types import NullType
 import pytest
 import string
@@ -32,3 +32,16 @@ def test_match_location_to_state_missing_state():
 def test_match_location_to_state_missing_value():
     assert (__match_location_to_state("") == None)
     assert (__match_location_to_state(None) == None)
+
+
+def test_remove_symbols_from_description():
+    test_data = [
+        ("in \"\"Inspiring Generations through Knowledge and Discovery.\"\" EOE\"",
+         "in Inspiring Generations through Knowledge and Discovery EOE"),
+        ("ASP.NET MVC (C#), HTML, JavaScript.-Experience building or maintai",
+         "ASPNET MVC C HTML JavaScriptExperience building or maintai")
+    ]
+
+    for current_test in test_data:
+        assert (__remove_symbols_from_description(
+            current_test[0]) == current_test[1])
