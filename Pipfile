@@ -19,6 +19,12 @@ python-dotenv = "*"
 plotly = "*"
 pandas_bokeh = "*"
 nltk = "*"
+requests = "*"
+geopandas = "*"
+shapely = "*"
+bokeh = "*"
+pexpect = "*"
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "3.7"
