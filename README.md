@@ -6,21 +6,35 @@ It's common knowledge that a majority of software engineers identify as male. De
 
 We're interested in exploring the role the wording of job postings play in potentially discouraging non-male candidates from applying. This project is inspired by Textio.
 
-## Questions
+## Development
 
-1. Out of X randomly collected software engineering jobs, what percentage have gender-specific pronouns?
-2. What’s the percentage breakdown by state/region?
-3. What are the most common keywords that encourage/discourage applicants?
-4. Does the company size or location influence a company's inclusion initiatives?
+**Note**: Due to depeendency issues this project does notrun on Windows. You'll need to resolve depeendency issues manually.
 
-## Whos Interested
+### Installing Dependencies:
 
-Increasingly, the tech industry is focusing its efforts on addressing systematic barriers to inclusion. 
+We're using [Pipenv as our enviornment manager](https://pipenv.readthedocs.io/en/latest/).
 
-## Public Policy / Topics
+**Install Dependnecies**
 
-Inclusion in the tech industry, culture, and recruiting.
+`pipenv install`
 
-## Data Source
+**Run Notebook**
 
-As our data source, we'll be using hte LinkedIn job search tool.
+`pipenv run jupyter notebook`
+
+or
+
+```shell
+pipenv shell
+jupter notebook
+```
+
+**To run the ETL pipeline**
+
+You might need to install Spark as well as PySpark
+
+`pipenv run spark-submit etl_pipeline/pipeline.py`
+
+### Data
+
+All data is tored in the `/data` directory. `derived_job_data.csv` is the final CSV file created from the pipeline. 
